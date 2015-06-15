@@ -1,0 +1,108 @@
+/* 
+ * File:   main.c
+ * Author: Alyssa Nielsen - annhx3
+ * Lab 1 - 
+ * Created on June 10, 2015, 1:40 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#define BUFFER_SIZE 100
+
+int length(char* inputString);
+void copy(char* inputString, char* copiedString, int length);
+void reverse(char* inputString, char* reversedString, int length);
+void clear(char* inputString);
+void merge(char* inputString, char* secondString, char* mergedString);
+
+/*
+ * 
+ */
+int main(int argc, char** argv) {
+    
+    int i;
+    
+    *(argv + 1) = "Example";
+    printf("argc: %d\n", argc);
+    if (argc != 1){
+        printf("\nInvalid number of parameters\n");
+        return 0;
+    }
+    
+    char* inputBuffer = (char*) malloc(sizeof(char) * BUFFER_SIZE);
+    if (inputBuffer == NULL) {
+        printf("Unable to allocate input buffer. Closing.\n");
+        return(-1);
+    }
+    
+    char* copiedString = NULL;
+    char* reversedString = NULL;
+    char* mergedString = NULL;
+    int stringLength;
+    
+    printf("\nPlease enter a string: ");
+    fgets(inputBuffer, BUFFER_SIZE, stdin);
+    stringLength = length(inputBuffer);
+    printf("\nInput string is %d characters long.", stringLength);
+    copiedString = malloc(sizeof(char)* BUFFER_SIZE);
+    copy(inputBuffer, copiedString, stringLength);
+    printf("\nCopied string is %s", copiedString);
+    reversedString = malloc(sizeof(char)* BUFFER_SIZE);
+    reverse(inputBuffer, reversedString, stringLength);
+    printf("\nReversed string is: %s", reversedString);
+    
+    printf("\nCommand line input is: %s", *(argv + 1));
+    int x = length(*(argv + 1));
+    printf("\nLength of command line input is %d", x + 1);
+    mergedString = malloc(sizeof(char) * (stringLength + x + 2));
+    merge(inputBuffer, *(argv + 1), mergedString);
+    printf("\nMerged string is: %s", mergedString);
+    
+    clear(mergedString);
+    clear(reversedString);
+    clear(copiedString);
+    clear(inputBuffer);
+    return (EXIT_SUCCESS);
+}
+int length(char* inputString){
+    int i = 0, count = 0;
+    
+    while(1){
+        count++;
+        i++;
+        if(*(inputString + i) == '\0'){
+            return (count - 1);
+        }
+    }
+}
+void copy(char* inputString, char* copiedString, int length){
+    int i; 
+    
+    for(i = 0; i < length; i++){
+        while(*(inputString + i) != '\0'){
+            *(copiedString + i) = *(inputString + i);
+            i++;
+        }
+        copiedString = '\0';
+    }
+}
+void reverse(char* inputString, char* reversedString, int length){
+    int i, c = (length - 1);
+    
+    for(i = 0; c >= 0; c--, i++)
+        *(reversedString + c) = *(inputString + i); 
+}
+void clear(char* inputString){
+    if(inputString != NULL){
+    free(inputString);
+    }
+}
+void merge(char* inputString, char* secondString, char* mergedString){
+    int c = length(inputString), d = length(secondString);
+    int i = 0, j = 0;
+    
+    for(i = 0; i < c; i++)
+        *(mergedString + i) = *(inputString + i);
+    for(j = 0; j <= d; j++)
+        *(mergedString + c + j) = *(secondString + j);
+}
