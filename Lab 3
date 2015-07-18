@@ -1,0 +1,144 @@
+/* 
+ * File:   main.c
+ * Author: annhx3 - Alyssa Nielsen
+ *
+ * Created on June 24, 2015, 1:25 PM
+ */
+/*libraries to include*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/*global sizes defined*/
+#define NAME_SIZE 25
+#define NUM_SCORES 3
+/*create struct with type Student*/
+typedef struct{
+    char name[NAME_SIZE];
+    int scores[NUM_SCORES];
+} Student;
+
+/*prototypes for reading and writing data from/to file*/
+
+Student read_student_data(const char* fileName, int index);
+void update_student_data(const char* fileName, int index, Student updatedStudent);
+
+/*
+ * 
+ */
+int main(int argc, char** argv) {
+    
+    /*variables initialized*/
+    
+    int index = 0;
+    int i;
+    /*ask user for index of student they want to view*/
+    printf ("\nEnter the index of the student you want to load(1-100): ");
+    scanf("%d", &index);
+    if (index < 1 || index > 100){
+        printf("\nInvalid index, please enter a new index to load (1-100): ");
+        scanf("%d", &index);
+    }
+    /*create instance of Student struct*/
+    Student student;
+    /*give file a name*/
+    const char *fileName = "input.txt";
+
+    /*student instance gets student returned from data read at index*/
+    student = read_student_data(fileName, index);
+    //print name and scores of student info in the student struct instance
+    printf("\nName: %s", student.name);
+    printf("\nScore 1: %d", student.scores[0]);
+    printf("\nScore 2: %d", student.scores[1]);
+    printf("\nScore 3: %d", student.scores[2]);
+    //have user update scores for student
+    printf("\nUpdating this student's scores\n");
+    printf("Please enter a new score for exam 1: ");
+    scanf("%d", &student.scores[0]);
+    printf("Please enter a new score for exam 2: ");
+    scanf("%d", &student.scores[1]);
+    printf("Please enter a new score for exam 3: ");
+    scanf("%d", &student.scores[2]);
+    //update file with new scores
+    update_student_data(fileName, index, student);
+    //read new scores from file to check they were written in 
+    read_student_data(fileName, index);
+    printf("\nName: %s", student.name);
+    printf("\nScore 1: %d", student.scores[0]);
+    printf("\nScore 2: %d", student.scores[1]);
+    printf("\nScore 3: %d", student.scores[2]);
+    puts("");
+    //BONUS!!!
+    printf("\n~~~~~~~BONUS!!!!~~~~~~~\n");
+    //enter index you want to begin reading from file
+    printf ("\nEnter the index of the student you want to load(1-100): ");
+    scanf("%d", &index);
+    if (index < 1 || index > 100){
+        printf("\nInvalid index, please enter a new index to load (1-100): ");
+        scanf("%d", &index);
+    }
+    //read, update and print updated info of 5 students starting at index user chooses
+    for (i = 0; i < 5; i++){
+        student = read_student_data(fileName, index);
+        printf("\nStudent %d: ", i+1);
+        printf("\nName: %s", student.name);
+        printf("\nScore 1: %d", student.scores[0]);
+        printf("\nScore 2: %d", student.scores[1]);
+        printf("\nScore 3: %d", student.scores[2]);
+
+        printf("\n\nUpdate this student's scores\n");
+        printf("Please enter a new score for exam 1: ");
+        scanf("%d", &student.scores[0]);
+        printf("Please enter a new score for exam 2: ");
+        scanf("%d", &student.scores[1]);
+        printf("Please enter a new score for exam 3: ");
+        scanf("%d", &student.scores[2]);
+
+        update_student_data(fileName, index, student);
+
+        read_student_data(fileName, index);
+
+        printf("\nStudent %d's new scores: ", i+1);
+        printf("\nName: %s", student.name);
+        printf("\nScore 1: %d", student.scores[0]);
+        printf("\nScore 2: %d", student.scores[1]);
+        printf("\nScore 3: %d", student.scores[2]);
+        puts("");
+        puts("");
+        index++;
+    }
+    
+    //exit program
+    return (EXIT_SUCCESS);
+}
+//read data from file at index chosen by user
+Student read_student_data(const char* fileName, int index){
+    FILE* inputFile;
+    Student student;
+    
+    if ((inputFile = fopen(fileName, "rb+")) == NULL){
+        printf("Could not open input file");
+        return student;
+    }
+    fseek(inputFile, (index - 1) * sizeof(Student), SEEK_SET);
+    
+    fread(&student, sizeof(Student), 1, inputFile);
+ 
+    fclose(inputFile);
+    return student;
+}
+/*write data updated by user at index chosen*/
+void update_student_data(const char* fileName, int index, Student updatedStudent){
+    FILE* outputFile;
+    
+    if((outputFile = fopen(fileName, "rb+")) == NULL){
+        printf ("Could not open output file. Exiting");
+        return;
+    }
+    fseek(outputFile, (index - 1) * sizeof(Student), SEEK_SET);
+    fwrite (&updatedStudent, sizeof(Student), 1, outputFile);
+
+    fclose(outputFile);
+    return;
+    
+}
