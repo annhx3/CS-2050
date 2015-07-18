@@ -1,0 +1,151 @@
+/* 
+ * File:   main.c
+ * Author: tab4f2
+ *
+ * Created on June 15, 2015, 1:30 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFF_SIZE 100
+#define NUM_SCORES 3//number of exams (used to print out averages if #of exams needs to be changed)
+
+typedef struct student
+{
+    char* name;
+    int score[3];
+}Student;
+
+double average_score_by_exam(Student* students, int examIindex, int numStudents);
+double average_score_by_student(Student* student);
+void print_students(Student* students, int numStudents);
+void load_students_info(Student* students, int numStudents);
+int length(char* inputString);
+void clear_students(Student* students, int numStudents);
+/*
+ * 
+ */
+int main(int argc, char** argv) 
+{
+    int numStudents = 0;
+    int examIndex = 0;
+    char* inputString;
+    int i=0;
+    double avg=0;
+    
+    
+    printf("How many students?\n");
+    scanf("%d", &numStudents);
+    
+    Student students[numStudents];
+    
+    load_students_info(students, numStudents);
+    print_students(students, numStudents);
+    
+    for (i=0; i<NUM_SCORES; i++)
+    {
+        avg = average_score_by_exam(students, i, numStudents);
+        printf("\nAverage score on exam %d was: %.2f", i+1, avg);
+    }
+    
+    for (i=0; i<numStudents; i++)
+    {
+        //avg = average_score_by_student(&student[i]);
+        printf("\nAverage exam score for %s: %.2f", students[i].name, avg);
+    }
+    return (EXIT_SUCCESS);
+}
+
+double average_score_by_exam(Student* students, int examIndex, int numStudents)
+{
+    int i=0;
+    int total=0;
+    double avg=0;
+    
+    for (i=0; i<numStudents; i++)
+    {
+        total += students[i].score[examIndex];
+    }
+    avg = (double)total/numStudents;
+   
+    //printf("\nthe average is %f", avg);
+    
+    return avg;
+}
+
+double average_score_by_student(Student* student)
+{
+    int i, j=0;
+    int total=0;
+    float avg=0;
+    
+    for (i=0; i<NUM_SCORES-1; i++)
+    {
+        total += student->score[i];
+    }
+    avg = (double)total/NUM_SCORES;
+    printf("\nthe average is %f", avg);
+    
+    return avg;
+}
+
+void print_students(Student* students, int numStudents)
+{
+    int i=0;
+    
+    for (i=0; i<numStudents; i++)
+    {
+        printf("\n\nStudent: %d", i+1);
+        printf("\nName: %s", students[i].name);
+        printf("\nScore 1: %d", students[i].score[0]);
+        printf("\nScore 2: %d", students[i].score[1]);
+        printf("\nScore 3: %d", students[i].score[2]);
+        //printf("The student %s has a score of %d.\n", wClass[i].name, wClass[i].score);
+    }
+}
+
+void load_students_info(Student* students, int numStudents)
+{
+    int i=0;
+    int score1, score2, score3 = 0;
+    char input[BUFF_SIZE];
+    
+    for (i=0; i<numStudents; i++)
+    {
+        printf("\nPlease enter name for student %d: ", i+1);
+        scanf("%s", input);
+        
+        printf("Please enter first score for student %d: ", i+1);
+        scanf("%d", &score1);
+        printf("Please enter second score for student %d: ", i+1);
+        scanf("%d", &score2);
+        printf("Please enter third score for student %d: ", i+1);
+        scanf("%d", &score3);
+        students[i].name = (char*) malloc((length(input)+1) * sizeof(char));
+        
+        strcpy(students[i].name, input);
+        //students[i].name = input[i];
+        students[i].score[0] = score1;
+        students[i].score[1] = score2;
+        students[i].score[2] = score3;
+    }
+}
+
+int length(char* inputString)
+{
+    int i=0;
+	int count=0;
+
+	for (i=0; inputString[i] != '\0'; i++)
+	{
+		count++;
+	}
+	return count;
+}
+
+void clear_students(Student* students, int numStudents)
+{
+    free(students);
+}
