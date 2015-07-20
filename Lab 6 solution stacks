@@ -1,0 +1,135 @@
+/* 
+ * File:   main.c
+ * Author: Alyssa
+ *
+ * Created on July 17, 2015, 8:08 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct node_{
+	char data;
+	struct node_ *next;
+}node;
+
+typedef struct stack_{
+	unsigned int size;
+	node* stack;
+}stack;
+
+#define MAX_EQU_LEN 100
+
+stack* create_stack(){
+	stack *s = malloc(sizeof(stack));
+	s->size = 0;
+	s->stack = NULL;
+	
+	return s;
+}
+
+void push(stack* s, char val){
+	node* n = malloc(sizeof(node));
+	n->data = val;
+	n->next = s->stack;
+	s->stack = n;
+	s->size++;
+}
+
+void pop(stack* s){
+	node* n = s->stack;
+	s->stack = n->next;
+	free(n);
+	s->size--;
+}
+
+char top(stack* s){
+	return s->stack->data;
+}
+
+int paren_match(char* equation){
+	stack *s = create_stack();
+		
+	int i;
+	for(i = 0;equation[i] != '\0'; i++){
+		if(equation[i] == '(')
+			push(s, equation[i]);
+		else if(equation[i] == ')'){
+			if(s->size != 0){
+				pop(s);
+			}else{
+				return 0;
+			}
+		}
+	}
+	
+	if(s->size == 0)
+		return 1;
+	else
+		return 0;
+}
+
+
+int paren_and_brackets_match(char* equation){
+	stack *s = create_stack();
+	
+	int i;
+	for(i = 0;equation[i] != '\0'; i++){
+		if(equation[i] == '(' || equation[i] == '[')
+			push(s, equation[i]);
+		else if(equation[i] == ')'){
+			if(s->size == 0 || '(' != top(s)){
+				return 0;
+			}else{
+				pop(s);
+			}
+		}else if(equation[i] == ']'){
+			if(s->size == 0 || '[' != top(s)){
+				return 0;
+			}else{
+				pop(s);
+			}
+		}
+	}
+	
+	if(s->size == 0)
+		return 1;
+	else
+		return 0;
+}
+
+
+int main(int argc, char* argv[]){
+	if(argc != 2){
+		fprintf(stderr, "Incorrect number of command line arguments\n");
+		return -1;
+	}
+	
+	FILE* fp = fopen(argv[1], "r");
+	
+	if(fp == NULL){
+		fprintf(stderr, "Unable to open file %s\n", argv[1]);
+		return -2;
+	}
+	
+	char* equ = malloc(sizeof(char) * MAX_EQU_LEN);
+	
+	while(1){
+		fscanf(fp, "%s", equ);
+		
+		if(feof(fp)){
+			break;
+		}
+	
+		int result = paren_match(equ);
+		int bonus = paren_and_brackets_match(equ);
+	
+		printf("For equation %s; Parens%smatch : Bonus Brackets%smatch\n", equ, result ? " " : " do not ", bonus ? " " : " do not ");
+	}
+	
+	free(equ);
+	return 0;
+}
+
+
+
