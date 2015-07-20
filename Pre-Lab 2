@@ -1,0 +1,74 @@
+/* 
+ * File:   main.c
+ * Author: Alyssa Nielsen - ANNHX3
+ *
+ * Created on June 14, 2015, 11:25 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define NAME 20
+#define SCORE 100
+
+/*
+ * 
+ */
+    typedef struct {
+    char *name;
+    int score;
+    } Student;
+
+void loadStudentData(Student* newStudent, char* newName, int newScore);
+void printStudentData(Student student);
+void printStudentArray(Student* students, int numStudents);
+
+int main(int argc, char** argv) {
+
+    int num;
+    
+    printf("\nHow many students would you like to add to the array?: ");
+    scanf("%d", &num);
+    char *nameSpace = malloc(sizeof(char) * NAME);
+    Student *students = malloc(sizeof(Student) * num), aStudent;
+    int score;
+    
+    int i = 0;
+    while (i < num){
+        printf("\nEnter the student name: ");
+        scanf("%s", nameSpace);
+        printf("\nEnter the student score: ");
+        scanf("%d", &score);
+        loadStudentData(students + i, nameSpace, score);
+        i++;
+    }
+        printStudentData(students[0]);
+        puts("");
+        printStudentArray(students, num);
+        puts("");
+    
+        free(students);
+        
+    return (EXIT_SUCCESS);
+}
+void loadStudentData(Student* aStudent, char* newName, int newScore){
+    int len = strlen(newName);
+    aStudent->name = malloc(len + 1);
+    strncpy(aStudent->name,newName, len);
+    aStudent->name[len] = '\0';
+    aStudent->score = newScore;
+ 
+    aStudent->score = newScore;
+}
+void printStudentData(Student student){
+    
+    printf("\nStudent name and score: %s, %d", student.name, student.score);
+}
+void printStudentArray(Student* students, int numStudents){
+    int i;
+    for(i = 0; i < numStudents; i++){
+       printStudentData(students[i]);
+    }
+        
+}
