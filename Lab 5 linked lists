@@ -1,0 +1,229 @@
+/* 
+ * File:   main.c
+ * Author: annhx3 - Alyssa Nielsen
+ * Lab 5
+ * Created on July 8, 2015, 1:18 PM
+ */
+//struct defined
+
+typedef struct node {
+    int stuID;
+    struct node* nextPtr;
+} Node;
+//function prototypes
+Node* create_node(int stuID);
+Node* add_node(Node* listHead, Node* newNode);
+Node* read_node_list_from_file(const char* fileName);
+int search(Node* listhead, int searchNum);
+void print_list(Node* listHead);
+void free_list(Node* listHead);
+//bonus!!!
+void write_data(const char* fileName, Node* listHead);
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define NUM_STUDENTS 10
+
+//create - malloc space/free 
+//dont check malloc for success
+//add - take add from 1st node in list and new node
+//search - check if any node in list has id, return which node(index)
+//free entire list
+
+/*
+ * intro to linked lists - read in list from file one node at a time
+ * print list of students id's 
+ * bonus - print output file of random id's
+ */
+int main(int argc, char** argv) {
+    //seed random 
+    srand(time(NULL));
+    //variables
+    int searchNum;
+    Node* listHead;
+    //input file
+    const char *fileName = "input.txt";
+    //list head contains 
+    listHead = read_node_list_from_file(fileName);
+
+    print_list(listHead);
+
+    printf("\nEnter a number to search for: ");
+    scanf("%d", &searchNum);
+
+
+    int index = search(listHead, searchNum);
+
+    if (index != -1) {
+        printf("\nStudent with stuID %d found at index %d\n", searchNum, index);
+    } else {
+        printf("\nstuID not found.");
+    }
+
+    puts("");
+
+    //BONUS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    printf("\nBONUS!!!\n");
+    printf("\nLINKED LIST WITH RANDOM IDS\n");
+
+    const char* outputName = "output.txt";
+
+    int i = 0;
+    Node* startNode = NULL;
+
+    //changing temp variable. 
+    Node* newNode = NULL;
+    int tempStuID;
+
+    for (i = 0; i < NUM_STUDENTS; i++) {
+        tempStuID = (rand() % 1000) + 1;
+        newNode = create_node(tempStuID);
+
+        startNode = add_node(startNode, newNode);
+
+    }
+    for (i = 0; i < NUM_STUDENTS; i++) {
+        write_data(outputName, startNode);
+    }
+    
+    startNode = read_node_list_from_file(outputName);
+    print_list(startNode);
+    printf("\nBONUS COMPLETE!!!\n");
+    free_list(startNode);
+
+    free_list(listHead);
+
+    return (EXIT_SUCCESS);
+}
+
+Node* create_node(int stuID) {
+
+    Node * newNode = (Node*) malloc(sizeof (Node));
+
+    newNode->stuID = stuID;
+    newNode->nextPtr = NULL;
+
+    return newNode;
+}
+/*
+Node* add_node(Node* listHead, Node* newNode) {
+    Node* currentNode = listHead;
+
+    //We have the check for the case where the list is empty first. 
+    if (currentNode == NULL) {
+        return newNode;
+    }
+
+    //We want to go to the end of the list, so we use a loop to get there.
+    while (currentNode->nextPtr != NULL) {
+        currentNode = currentNode->nextPtr;
+    }
+
+    //Now we are at the end of the list node, so add the newNode to the list...
+    currentNode->nextPtr = newNode;
+    return listHead;
+}
+*/
+Node* read_node_list_from_file(const char* fileName) {
+    FILE* inputFile;
+
+    Node* newNode = NULL;
+    Node tempNode;
+    Node* startNode = NULL;
+
+    int i;
+
+    if ((inputFile = fopen(fileName, "rb+")) == NULL) {
+        printf("\nCould not open file!\n");
+    }
+    for (i = 0; i < NUM_STUDENTS; i++) {
+        fread(&tempNode, sizeof (Node), 1, inputFile);
+        newNode = create_node(tempNode.stuID);
+        startNode = add_node(startNode, newNode);
+
+    }
+    return startNode;
+    fclose(inputFile);
+}
+
+int search(Node* listHead, int searchNum) {
+    int i = 1;
+
+    while (listHead != NULL) {
+        if (listHead->stuID == searchNum) {
+            return i;
+        }
+        listHead = listHead->nextPtr;
+        i++;
+    }
+    return -1;
+}
+
+void print_list(Node* listHead) {
+    Node* currentNode = listHead;
+    int i = 1;
+
+    while (currentNode != NULL) {
+        printf("Printing student %d:\n", i);
+        printf("\tStudent ID: %d\n", currentNode->stuID);
+        currentNode = currentNode->nextPtr;
+        i++;
+    }
+    return;
+}
+
+void free_list(Node* listHead) {
+    //Use temp to be able to free nodes as we traverse the list.
+    Node* temp;
+
+    //set temp = listHead and see if our lists is empty...
+    while ((temp = listHead) != NULL) {
+        //set the head of the list to the next node...
+        listHead = listHead->nextPtr;
+        //and free the node we are on. 
+        free(temp);
+    }
+    return;
+}
+
+void write_data(const char* fileName, Node* listHead) {
+    FILE* outputFile;
+
+    if ((outputFile = fopen(fileName, "wb+")) == NULL) {
+        printf("\nCould not open file!\n");
+        exit(1);
+    }
+
+    fwrite(listHead, sizeof (Node), NUM_STUDENTS, outputFile);
+
+    fclose(outputFile);
+
+}
+
+Node* add_node(Node* listHead, Node* newNode) {
+    Node* currentNode = listHead;
+    Node* previous = NULL;
+
+    //We have the check for the case where the list is empty first. 
+    /*if (currentNode == NULL) {
+        return newNode;
+    }
+*/
+    //We want to go to the end of the list, so we use a loop to get there.
+    while (currentNode != NULL && newNode->stuID > currentNode->stuID) {
+        previous = currentNode;
+        currentNode = currentNode->nextPtr;
+    }
+    if(previous == NULL){
+        newNode->nextPtr = listHead;
+        listHead = newNode;
+    }
+    else{
+        previous->nextPtr = newNode;
+        newNode->nextPtr = currentNode;
+    }
+        
+    return listHead;
+}
