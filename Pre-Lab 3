@@ -1,0 +1,178 @@
+/* 
+ * File:   main.c
+ * Author: tab4f2
+ *
+ * Created on June 15, 2015, 1:30 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+//#include <string.h>
+#define NAME_SIZE 25
+#define NUM_SCORES 3
+//#define BUFF_SIZE 100
+
+typedef struct 
+{
+    char name[25];
+    int score[3];
+}Student;
+/*
+double average_score_by_exam(Student* students, int examIindex, int numStudents);
+double average_score_by_student(Student* student);
+ */
+
+void print_students(Student* students, int numStudents);
+//void load_students_info(Student* students, int numStudents);
+//int length(char* inputString);
+//void clear_students(Student* students, int numStudents);
+void write_data(Student *students, int numStudents, const char* filename);
+void read_data(Student *s, int num/*, const char *filename */);
+/*
+ * 
+ */
+int main(int argc, char** argv) 
+{
+    
+    int numStudents = 0;
+    int i=0;
+
+    
+    
+    printf("How many students?\n");
+    scanf("%d", &numStudents);
+    
+    Student students[numStudents];
+    //= (Student*) malloc(sizeof(Student) * numStudents);
+    read_data(students, numStudents/*, filename.txt*/);
+    
+
+    
+   // load_students_info(&studentsPtr, numStudents);
+    write_data(students, numStudents, "input.txt");
+    print_students(students, numStudents);
+
+    
+    return (EXIT_SUCCESS);
+}
+
+
+void read_data(Student *s, int num){
+    //FILE *myFile;
+    int i;
+    for (i=0; i<num; i++)
+    {
+        printf("\nPlease enter name for student %d: ", i+1);
+        scanf("%s", s[i].name);
+        
+        printf("Please enter first score for student %d: ", i+1);
+        scanf("%d", &(s[i].score[0]));
+        printf("Please enter second score for student %d: ", i+1);
+        scanf("%d", &(s[i].score[1]));
+        printf("Please enter third score for student %d: ", i+1);
+        scanf("%d", &(s[i].score[2]));
+    }
+}
+void print_students(Student* students, int numStudents)
+{
+    int i=0;
+    
+    for (i=0; i<numStudents; i++)
+    {
+        printf("\n\nStudent: %d", i+1);
+        printf("\nName: %s", students[i].name);
+        printf("\nScore 1: %d", students[i].score[0]);
+        printf("\nScore 2: %d", students[i].score[1]);
+        printf("\nScore 3: %d", students[i].score[2]);
+        //printf("The student %s has a score of %d.\n", wClass[i].name, wClass[i].score);
+    }
+}
+/*
+void load_students_info(Student** students, int numStudents)
+{
+    int i=0;
+    int score1, score2, score3 = 0;
+    char input[BUFF_SIZE];
+    
+    for (i=0; i<numStudents; i++)
+    {
+        printf("\nPlease enter name for student %d: ", i+1);
+        scanf("%s", input);
+        
+        printf("Please enter first score for student %d: ", i+1);
+        scanf("%d", &score1);
+        printf("Please enter second score for student %d: ", i+1);
+        scanf("%d", &score2);
+        printf("Please enter third score for student %d: ", i+1);
+        scanf("%d", &score3);
+        students[i]->name //= (char*) malloc((length(input)+1) * sizeof(char));
+        
+        strcpy(students[i]->name, input);
+        //students[i].name = input[i];
+        students[i]->score[0] = score1;
+        students[i]->score[1] = score2;
+        students[i]->score[2] = score3;
+    }
+}
+
+}
+*/
+void write_data(Student * students, int numStudents, const char *filename){
+    /*FILE *myFile;
+    myFile = fopen(filename, "w");
+    if(myFile == NULL){ 
+        printf("ERROR");
+        return;
+    }
+    
+    fwrite(students, sizeof(Student), numStudents, myFile);
+    fclose(myFile);
+    
+        //Verify that we wrote the records by reading them in. 
+    if ((outputFile = fopen("students.txt", "rb")) == NULL) {
+        printf("Could not open output file. Exiting.\n");
+        return;
+    }
+    for (i = 0; i < numStudents; i++) {
+        fread(&test, sizeof (test), 1, myFile);
+        printf("\nINSIDE WRITE FUNCTION\nName: %s\n", test.name);
+        for (j = 0; j < NUM_SCORES; j++) {
+            printf("Score: %d\n", test.scores[j]);
+        }
+    }
+
+    fclose(outputFile);*/
+     FILE* outputFile;
+    Student test;
+    int i, j;
+
+    //Open the file for writing. If the file exists, it will be deleted. 
+    //If the file can not be opened, exit. 
+
+    if ((outputFile = fopen(filename, "wb")) == NULL) {
+        printf("Could not open output file. Exiting.\n");
+        return;
+    }
+
+    fwrite(students, sizeof (Student), numStudents, outputFile);
+
+    fclose(outputFile);
+
+    //Verify that we wrote the records by reading them in. 
+    if ((outputFile = fopen("input.txt", "rb")) == NULL) {
+        printf("Could not open output file. Exiting.\n");
+        return;
+    }
+    for (i = 0; i < numStudents; i++) {
+        fread(&test, sizeof (test), 1, outputFile);
+        printf("\nINSIDE WRITE FUNCTION\nName: %s\n", test.name);
+        for (j = 0; j < NUM_SCORES; j++) {
+            printf("Score: %d\n", test.score[j]);
+        }
+    }
+
+    fclose(outputFile);
+
+
+    return;
+}
