@@ -1,0 +1,216 @@
+/* 
+ * File:   main.c
+ * Author: annhx3
+ *
+ * Created on July 1, 2015, 1:23 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <string.h>
+
+/*
+ * 
+ */
+//define structure of employee ids and ages
+typedef struct employee{
+    int id;
+    int age;
+}Employee;
+//prototypes defined
+int allocate_space(Employee** empArray, int size, int howMany);
+void fill_array(Employee* empArray, int howMany);
+void merge_sort(Employee* empArray, int, int howMany);
+void print_array(Employee* people, int numPeople);
+void my_merge(Employee* empArray, int x, int y, int z);
+void bubble_sort(Employee* people, int numPeople);
+
+int main(int argc, char** argv) {
+    //create instance of type Employee called empArray
+    Employee* empArray = NULL;
+    //begin with 5 employees
+    int howMany = 5;
+    //seed random
+    srand(time(NULL));
+    //run time struct
+    struct timeval start, end;
+    double elapsedTime;
+    //if no space, give error
+    if(allocate_space(&empArray, sizeof(Employee), howMany)){
+        printf ("Unable to malloc space. Exiting.\n");
+        return (EXIT_FAILURE);
+    }
+ //fill array with random ids and ages   
+fill_array(empArray, howMany);
+//print array
+printf("\nBEFORE SORTING: \n");
+print_array(empArray, howMany);
+//merge sort array of employees
+merge_sort(empArray, 0, howMany - 1);
+//print array after sort
+printf("AFTER SORTING: \n");
+print_array(empArray, howMany);
+puts("");
+
+//loop to check run time of merge sorting and bubble sorting 10- million size array
+for (howMany = 10; howMany <= 1000000; howMany *= 10){
+    //if space cant be allocated give error
+    if(allocate_space(&empArray, sizeof (Employee), howMany)){
+        //error mallocing space
+        printf ("Unable to malloc space. Exiting.\n");
+        return (EXIT_FAILURE);
+    }
+        //fill array with random ints
+        fill_array(empArray, howMany);
+        //get start time
+        gettimeofday(&start, NULL);
+        //merge sort array of employees
+        merge_sort(empArray, 0, howMany - 1);
+        //get end time
+        gettimeofday(&end,NULL);
+        
+
+     // compute and print the elapsed time in millisec
+        elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+        elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+        //print times for merge sort at each interval
+        printf("Merge sort took %lf ms for %d records.\n", elapsedTime, howMany);
+        
+        //fill array with random employee info
+        fill_array(empArray, howMany);
+        //get start time
+        gettimeofday(&start, NULL);
+        //bubble sort employees
+        bubble_sort(empArray, howMany);
+        //end start time
+        gettimeofday(&end,NULL);
+        // compute and print the elapsed time in millisec
+        elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;      // sec to ms
+        elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+        //print bubble sort run time
+        printf("Bubble sort took %lf ms for %d records.\n", elapsedTime, howMany);
+        //free empArray in memory
+        free(empArray);
+    }
+        
+    return (EXIT_SUCCESS);
+}
+
+//allocate space for emp array
+int allocate_space(Employee** empArray, int size, int howMany){
+
+    if ((*empArray = (Employee*) malloc(size * howMany)) == NULL){
+        //space cannot be allocated
+        return 1;    
+}
+    else return 0;
+}
+//fill array with random numbers
+void fill_array(Employee* people, int howMany){
+    int i;
+    
+    for (i = 0; i < howMany; i++) {
+        //generate a random number between 17 and 25 for the age.
+        people[i].age = (rand() % 9) + 17;
+        //generate a random number between 1 - 10000 for the ID. 
+        //NOTE: this is susceptible to collisions. 
+        people[i].id = (rand() % 10000) + 1;
+    }
+    return;
+}
+//print array info
+void print_array(Employee* people, int numPeople){
+    int i;
+    
+    for (i = 0; i < numPeople; i++) {
+        printf("Person %d:\n"
+                "\tID: %d\n"
+                "\tAge: %d\n",
+                i+1, people[i].id, people[i].age);
+    }
+    return;
+}
+//merge sort the id's
+void merge_sort(Employee* empArray, int x, int z ){
+        int y;
+	if(x < z){
+		y = (x + z)/2;
+		merge_sort(empArray,x,y);
+		merge_sort(empArray,y + 1,z);
+		my_merge(empArray,x,y,z);
+	}
+}
+//merge sort by id
+void my_merge(Employee* empArray, int x, int y, int z)
+{
+	Employee *temp = (Employee *)malloc((z - x + 1)* sizeof(Employee));
+
+	int mark1 = x, mark2 = y + 1;
+	int cnt = 0;
+
+	while(mark1 <= y && mark2 <= z){
+		if ((empArray + mark1)->id < (empArray + mark2)->id)
+		{
+			(temp + cnt)->id = (empArray + mark1)->id;
+			(temp + cnt)->age = (empArray + mark1)->age;
+			cnt++; mark1++;
+		}
+
+		else  	{
+			(temp+cnt)->id = (empArray + mark2)->id;
+			(temp+cnt)->age = (empArray + mark2)->age;
+			cnt++; mark2++;
+
+		}
+	}
+		while(mark1 <= y)
+		{
+			(temp + cnt)->id = (empArray + mark1)->id;
+			(temp + cnt)->age = (empArray + mark1)->age;
+			cnt++; mark1++;
+		
+		
+		}
+
+		while(mark2 <= z)
+
+		{ 	(temp+cnt)->id = (empArray+mark2)->id;
+			(temp+cnt)->age = (empArray+mark2)->age;
+			cnt++; mark2++;
+
+
+		}
+
+
+		memcpy(empArray + x, temp, (z - x + 1)*sizeof(Employee));
+		free(temp);
+	}
+//bubble sort id's
+    void bubble_sort(Employee* people, int numPeople) {
+    int i, j;
+    Employee temp;
+    
+    for (i=0; i< numPeople - 1; i++) {
+        for (j=0; j< numPeople - i - 1; j++) {
+            
+            if (people[j].id > people[j+1].id){
+                // swap the two structs.  
+                memcpy(&temp, &people[j], sizeof(Employee));
+                memcpy(&people[j], &people[j+1], sizeof(Employee));
+                memcpy(&people[j+1], &temp, sizeof(Employee));
+            }       
+        }
+    }
+    return;
+}
+/*
+         //fill array again with random ints
+        fill_array(empArray, howMany);
+        //get start time
+        gettimeofday(&start, NULL);
+        
+        merge_sort(empArray, 0, howMany - 1);
+        bubble_sort(empArray, howMany);
+        gettimeofday(&end,NULL);
+ */
