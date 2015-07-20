@@ -1,0 +1,187 @@
+/* 
+ * File:   main.c
+ * Author: Alyssa
+ *
+ * Created on July 14, 2015, 8:48 PM
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+/*
+ * 
+ */
+
+typedef struct node_ {
+    int project_num;
+    struct node_* next;
+} node;
+
+
+//node* create_stack(node* head, int value);
+node* push_stack(node* head, int value);
+node* pop_stack(node* head);
+
+void print_stack(node* head);
+int isEmpty(node* topPtr);
+void menu(void);
+//void free_list(node* listHead);
+
+int main(int argc, char** argv) {
+
+    node* stackPtr = NULL;
+    //stackPtr->project_num = NULL;
+    //stackPtr->next = NULL;
+
+    int choice;
+    int value;
+
+    menu();
+    printf("%s", "\n? ");
+    scanf("%d", &choice);
+
+    while (choice > 0 && choice < 4) {
+        switch (choice) {
+            //push value onto stack
+            case 1:
+                printf("\nEnter an integer: ");
+                scanf("%d", &value);
+                stackPtr = push_stack(stackPtr, value);
+                print_stack(stackPtr);
+                break;
+            //pop value off stack
+            case 2:
+                //if stack not empty
+                if (!isEmpty(stackPtr)) {
+                    stackPtr = pop_stack(stackPtr);
+                    print_stack(stackPtr);
+                    break;
+                } 
+                else {
+                    printf("\nSorry - there are no projects to complete.  \nTry again: ");
+                    scanf("%d", &choice);
+                }
+            //exit and go home
+            case 3:
+                if (isEmpty(stackPtr)) {
+                    printf("\nGood night!\n\n"); 
+                    break;
+                }
+                else{
+                    printf("Sorry, you can't go home.  There is more work to do!\n");
+                    break;
+                }
+                break;
+            default: puts("Invalid choice. \n");
+                menu();
+                printf("%s", "\n? ");
+                //scanf("%d", &choice);
+                break;
+        }//end switch
+        if(isEmpty(stackPtr) && choice == 3)
+        {
+        break;
+        }
+        menu();
+        printf("%s", "\n? ");
+        scanf("%d", &choice);
+
+    }
+    
+    return (EXIT_SUCCESS);
+}
+
+/*
+node* create_stack(node* head, int value)
+{
+    node* newStack;
+
+  // Allocate a new array to hold the contents.
+  newStack = (node*)malloc(sizeof(node)* value);
+
+  if (newStack == NULL) {
+    printf("Insufficient memory to initialize stack.\n");
+    exit(1);  // Exit, returning error code. 
+  }
+
+  stackP->contents = newContents;
+  stackP->maxSize = maxSize;
+  stackP->top = -1;
+}
+ */
+
+node* push_stack(node* head, int value) {
+    node* newPtr;
+
+    newPtr = malloc(sizeof (node));
+
+    //insert node at stack top
+    if (newPtr != NULL) {
+        newPtr->project_num = value;
+        newPtr->next = head;
+        head = newPtr;
+    } else {//no space available
+        printf("\n%d not inserted, no memory available.\n", value);
+    }
+            return head;
+}
+
+node* pop_stack(node* head) {
+    node* tempPtr;
+    int value;
+
+    tempPtr = head;
+    value =  head->project_num;
+    head = head->next;
+    printf("Project %d has been completed.\n", value);
+    free(tempPtr);
+    return head;
+}
+//user menu 
+
+void menu(void) {
+    puts("\nEnter choice:\n"
+            "1) to add a project\n"
+            "2) to complete a project\n"
+            "3) to go home");
+}
+//return 1 if the stack is empty, 0 otherwise
+
+int isEmpty(node* topPtr) {
+    return topPtr == NULL;
+}
+
+void print_stack(node* head)
+{
+    //if stack is empty
+    if(head == NULL){
+        puts("The stack is empty.\n");
+    }
+    else{
+        puts("The stack is: ");
+        
+        //while not end of stack
+        while(head != NULL){
+            printf("%d --> ", head->project_num);
+            head = head->next;
+        }//end while
+        puts("");
+    }//end else
+}
+
+//free memory of each node
+/*
+void free_list(node* listHead) {
+    //Use temp to be able to free nodes as we traverse the list.
+    node* temp;
+
+    //set temp = listHead and see if our lists is empty...
+    while ((temp = listHead) != NULL) {
+        //set the head of the list to the next node...
+        listHead = listHead->next;
+        //and free the node we are on. 
+        free(temp);
+    }
+    return;
+}
+*/
